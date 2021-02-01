@@ -1,0 +1,58 @@
+version: '3'
+
+
+
+
+services: 
+  db:
+    image: mysql:5.7
+    ports: 
+      - "3306"
+    restart: always
+    environment: 
+      MYSQL_DATABASE: myDb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test 
+    volumes: 
+      - ./sql:/docker-entrypoint-initdb.d
+      - ./sql:/etc/mysql/conf.d
+    command: --default-authentication-plugin=mysql_native_password
+    networks: 
+      - dev_web
+
+
+#web
+  www:
+    depends_on: 
+      - db
+    build: ./php
+    volumes: 
+      - ./www:/var/www/html
+    ports: 
+      - "8001:80"
+    networks: 
+      - dev_web 
+
+    
+
+#phpmyadmin
+  phpmyadmin:
+    depends_on: 
+      - db
+    image: phpmyadmin/phpmyadmin
+    ports: 
+      - 8000:80
+    environment: 
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test 
+    networks: 
+      - dev_web
+
+    
+networks: 
+  dev_web:
+  
+
+  
